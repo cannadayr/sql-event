@@ -24,7 +24,31 @@ start_moment(time_ref) as (
     select '2018-01-01 01:30:00' as time_ref
 ),
 end_moment(time_ref) as (
-    select '2018-01-01 02:00:00' as time_ref
+    --select '2018-01-01 01:30:04' as time_ref
+    select '2018-01-01 03:30:10' as time_ref
+),
+this_entity(id) as (
+    select 1
 )
 
-select * from time_range;
+select
+    time_range.this_time_ref,
+    (
+        select
+            id
+
+        from event
+
+        where
+            entity_id = 1
+            and end_time < time_range.this_time_ref
+
+        order by end_time desc
+
+        limit 1
+    ) as prev_event_id
+
+from
+    time_range
+;
+
