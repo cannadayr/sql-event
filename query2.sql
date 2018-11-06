@@ -21,11 +21,10 @@ tick_unit(unit) as (
     select '%s' as unit
 ),
 start_moment(time_ref) as (
-    select '2018-01-01 01:30:00' as time_ref
+    select '2018-01-01 02:59:58' as time_ref
 ),
 end_moment(time_ref) as (
-    --select '2018-01-01 01:30:04' as time_ref
-    select '2018-01-01 03:30:10' as time_ref
+    select '2018-01-01 03:00:04' as time_ref
 ),
 this_entity(id) as (
     select 1
@@ -46,9 +45,14 @@ select
         order by end_time desc
 
         limit 1
-    ) as prev_event_id
+    ) as prev_event_id,
+    prev_event.start_time,
+    prev_event.end_time
 
 from
     time_range
+
+join event prev_event on prev_event.id = prev_event_id
+
 ;
 
