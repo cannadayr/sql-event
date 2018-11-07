@@ -1,72 +1,68 @@
-with moment(time_ref) as (
-    select '2018-01-01 01:30:00' as time_ref
-),
-this_entity(id) as (
-    select 1
-),
-prev_event(id,start_time,end_time) as (
+with entity_collection(id) as (
     select
-        id,
-        start_time,
-        end_time
+        id
 
-    from event
+    from entity
 
-    where
-        entity_id = (select id from this_entity)
-        and end_time < (select time_ref from moment)
-
-    order by end_time asc
-
-    limit 1
+    group by id
 ),
-next_event(id,start_time,end_time) as (
-    select
-        id,
-        start_time,
-        end_time
-
-    from event
-
-    where
-        entity_id = (select id from this_entity)
-        and start_time > (select time_ref from moment)
-
-    order by start_time asc
-
-    limit 1
+moment(this_time_ref) as (
+    select '2018-01-01 01:05:00' as this_time_ref
 ),
-prev_event_threshold(threshold) as (
-    select "-1800 seconds" -- 30 mins
-),
-next_event_threshold(threshold) as (
-    select "+1800 seconds" -- 30 mins
+new_event(duration) as (
+    select '+1800 seconds' -- 30 minutes
 )
+
 select
-    this_moment.id,
-    this_moment.time_ref,
-    this_moment.prev_event_threshold,
-    this_moment.next_event_threshold,
-    this_moment.prev_event_end_time,
-    this_moment.next_event_start_time,
+    moment.this_time_ref,
+    entity_collection.id,
+    (
+        select
+            id
+
+        from event
+
+        where
+            entity_id = entity_collection.id
+            and end_time < moment.this_time_ref
+
+        order by end_time desc
+
+        limit 1
+    ) as prev_event_id,
+    prev_event.start_time as prev_event_start_time,
+    prev_event.end_time as prev_event_end_time,
+    (
+        select
+            id
+
+        from event
+
+        where
+            entity_id = entity_collection.id
+            and start_time > moment.this_time_ref
+
+        order by start_time asc
+
+        limit 1
+    ) as next_event_id,
+    next_event.start_time as next_event_start_time,
+    next_event.end_time as next_event_end_time,
     case when
-        this_moment.prev_event_threshold >= this_moment.prev_event_end_time
-        and this_moment.next_event_threshold <= this_moment.next_event_start_time
+        ( -- #TODO calculate cleanup and setup times from previous/current event
+            datetime(moment.this_time_ref,"-600 seconds") >= coalesce(prev_event.end_time,'1970-01-01 00:00:00')
+            and datetime(datetime(moment.this_time_ref,"+600 seconds"),(select duration from new_event)) <= coalesce(next_event.start_time,'9999-12-31 00:00:00')
+            and (select not count(id) from event where start_time <= moment.this_time_ref and end_time >= moment.this_time_ref)
+        )
         then "available" else "unavailable"
     end availability
-from (
-    select
-        (select id from this_entity) as id,
-        (select time_ref from moment) as time_ref,
-        datetime(
-            (select time_ref from moment),
-            (select threshold from prev_event_threshold)
-        ) as prev_event_threshold,
-        datetime(
-            (select time_ref from moment),
-            (select threshold from next_event_threshold)
-        ) as next_event_threshold,
-        (select end_time from prev_event) as prev_event_end_time,
-        (select start_time from next_event) as next_event_start_time
-    ) this_moment
+
+from
+    moment,
+    entity_collection
+
+left join event prev_event on prev_event.id = prev_event_id
+
+left join event next_event on next_event.id = next_event_id
 ;
+
