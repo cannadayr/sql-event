@@ -1,9 +1,15 @@
 <?php
 
+# global debug
+$GLOBALS['debug'] = true;
+#$GLOBALS['debug'] = false;
+
 function htprint($var) {
-    echo "<pre>";
-    print_r($var);
-    echo "</pre>";
+    if ($GLOBALS['debug']) {
+        echo "<pre>";
+        print_r($var);
+        echo "</pre>";
+    }
 }
 #htprint($_SERVER);
 
