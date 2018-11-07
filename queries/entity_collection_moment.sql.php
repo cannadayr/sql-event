@@ -10,7 +10,7 @@ with entity_collection(id) as (
     group by id
 ),
 moment(this_time_ref) as (
-    select '<?= $moment ?>' as this_time_ref
+    select '<?= $time ?>' as this_time_ref
 ),
 new_event(duration) as (
     select '+<?= $duration ?> seconds'

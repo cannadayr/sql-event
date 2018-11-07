@@ -33,7 +33,7 @@ try {
     $db = new PDO('sqlite:inventory.db',"","",$options);
 }
 catch(PDOException $e) {
-    htprint($e);
+    htprint($e,"EXCEPTION");
 }
 
 # parse request_url
@@ -43,25 +43,36 @@ $route = $url['path'];
 # GET requests
 if ($_SERVER['REQUEST_METHOD'] === "GET") {
 
-    #htprint($_GET);
+    htprint($_GET,"_GET");
     # get the availability of all entities at a single timestamp
-    if ($route === "/entity_collection_moment") {
+    if ($route === "/rooms") {
 
         # set get vars
-        /*
         if (isset($_GET)) {
-            (integer) $guests = isset($_GET['guests'])
+
+            $guests = (isset($_GET['guests']) && is_int((integer) $_GET['quests']))
                         ? $_GET['guests']
                         : NULL;
-            (integer) $storage = isset($_GET['storage'])
+            htprint($guests,"guests");
+
+            $storage = (isset($_GET['storage']) && is_int((integer) $_GET['storage']))
                         ? $_GET['storage']
                         : NULL;
-            $date = (isset($_GET['date'])
-                     && preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$_GET['date']))
-                        ? $_GET['date']
-                        : date("Y-m-d",time());
+            htprint($storage,"storage");
+
+            $duration = (isset($_GET['duration']) && is_int((integer) $_GET['duration']))
+                        ? ($_GET['duration'] * 60 * 60) # convert to seconds
+                        : NULL;
+            htprint($duration,"duration");
+
+            $time = (
+                        isset($_GET['time'])
+                        && strtotime($_GET['time'])
+                    )
+                    ? date_create_from_format("Y-m-d H:i:s",$_GET['time'])->format("Y-m-d H:i:s")
+                    : date("Y-m-d H:i:s",time());
+            htprint($time,"time");
         }
-        */
 
         # construct 'where' clauses
         /*
@@ -73,18 +84,16 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
                         : "";
         */
 
-        # build query
-        $duration = 1800; # seconds
-        $moment = "2018-01-01 01:05:00";
-
         ob_start();
         require("queries/entity_collection_moment.sql.php");
         $query = ob_get_clean();
-        htprint($query);
+        htprint($query,"query");
 
         $results = $db->query($query)->fetchAll();
 
-        htprint($results);
+        htprint($results,"results");
+
+        htprint(json_encode($results,JSON_PRETTY_PRINT),"json_results");
     }
 
 }
