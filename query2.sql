@@ -10,21 +10,24 @@ with recursive time_range(this_time_ref) as (
     from time_range
 
     limit (
-        cast(strftime((select unit from tick_unit),(select time_ref from end_moment)) as integer)
-        - cast(strftime((select unit from tick_unit),(select time_ref from start_moment)) as integer)
+        (cast(strftime((select unit from tick_unit),(select time_ref from end_moment)) as integer)
+        - cast(strftime((select unit from tick_unit),(select time_ref from start_moment)) as integer)) / (select ratio from tick_ratio)
     )
 ),
 tick(rate) as (
-    select '+1 seconds' as rate
+    select '+60 seconds' as rate
 ),
 tick_unit(unit) as (
-    select '%s' as unit
+    select '%s' as unit -- seconds
+),
+tick_ratio(ratio) as (
+    select rtrim(ltrim((select rate from tick),'+'),' seconds')
 ),
 start_moment(time_ref) as (
-    select '2018-01-01 02:59:58' as time_ref
+    select '2017-12-31 23:00:00' as time_ref
 ),
 end_moment(time_ref) as (
-    select '2018-01-01 03:00:04' as time_ref
+    select '2018-01-01 07:00:00' as time_ref
 ),
 this_entity(id) as (
     select 1
