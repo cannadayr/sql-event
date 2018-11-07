@@ -31,6 +31,9 @@ end_moment(time_ref) as (
 ),
 this_entity(id) as (
     select 1
+),
+new_event(duration) as (
+    select '+1800 seconds' -- 30 minutes
 )
 
 select
