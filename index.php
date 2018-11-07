@@ -66,10 +66,14 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
         */
 
         # build query
-        $query = "
-select * from entity;
-        ";
+        $duration = 1800; # seconds
+        $moment = "2018-01-01 01:05:00";
+
+        ob_start();
+        require("queries/entity_collection_moment.sql.php");
+        $query = ob_get_clean();
         htprint($query);
+
         $results = $db->query($query)->fetchAll();
 
         htprint($results);

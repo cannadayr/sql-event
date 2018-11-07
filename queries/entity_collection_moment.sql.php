@@ -10,10 +10,10 @@ with entity_collection(id) as (
     group by id
 ),
 moment(this_time_ref) as (
-    select '2018-01-01 01:05:00' as this_time_ref
+    select '<?= $moment ?>' as this_time_ref
 ),
 new_event(duration) as (
-    select '+1800 seconds' -- 30 minutes
+    select '+<?= $duration ?> seconds'
 )
 
 select
