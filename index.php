@@ -4,13 +4,21 @@
 $GLOBALS['debug'] = true;
 #$GLOBALS['debug'] = false;
 
-function htprint($var) {
+function htprint($obj, $title = '#####', $verb = false) {
     if ($GLOBALS['debug']) {
-        echo "<pre>";
-        print_r($var);
-        echo "</pre>";
+        echo '<pre><br>';
+        echo "##### $title ##### $title ##### $title #####<br>";
+        if ($verb == true) {
+            var_dump($obj);
+        }
+        if ($verb == false) {
+            print_r($obj);
+        }
+        echo "<br>##### $title ##### $title ##### $title #####";
+        echo '<br></pre>';
     }
 }
+
 #htprint($_SERVER);
 
 # db conn
