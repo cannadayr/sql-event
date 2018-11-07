@@ -34,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
     if ($route === "/entity_collection_moment") {
 
         # set get vars
+        /*
         if (isset($_GET)) {
             (integer) $guests = isset($_GET['guests'])
                         ? $_GET['guests']
@@ -46,14 +47,17 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
                         ? $_GET['date']
                         : date("Y-m-d",time());
         }
+        */
 
         # construct 'where' clauses
+        /*
         $guest_clause = isset($guests)
                         ? "and r.max_guests >= $guests"
                         : "";
         $storage_clause = isset($storage)
                         ? "and r.max_storage >= $storage"
                         : "";
+        */
 
         # build query
         $query = "
