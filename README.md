@@ -16,6 +16,6 @@ php -S 127.0.0.1:9090
 Currently only the /rooms endpoint is written.
 A sample url to request:
 ```
-http://127.0.0.1:9090/rooms?guests=1&storage=0&date=2018-11-01
+http://127.0.0.1:9090/rooms?guests=12&duration=12&storage=1&time=2018-01-01%2000:00:00
 ```
 
