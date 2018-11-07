@@ -1,3 +1,6 @@
+<?php
+# vim: syn=sql
+?>
 with entity_collection(id) as (
     select
         id
