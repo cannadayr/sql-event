@@ -9,6 +9,8 @@ A simple API example to see if a room is available at a certain day
 ## SETUP STEPS
 From the project root directory:
 ```
+sqlite3 inventory.db < schema.sql
+sqlite3 inventory.db < sample_data.sql
 php -S 127.0.0.1:9090
 ```
 
