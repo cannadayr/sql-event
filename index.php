@@ -94,6 +94,11 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
         htprint($results,"results");
 
         htprint(json_encode($results,JSON_PRETTY_PRINT),"json_results");
+
+        # if we're not in debug mode return json normally
+        if (!$GLOBALS['debug']) {
+            print("<pre>".json_encode($results,JSON_PRETTY_PRINT)."</pre>");
+        }
     }
 
 }
