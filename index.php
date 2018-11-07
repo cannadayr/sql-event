@@ -19,7 +19,7 @@ function htprint($obj, $title = '#####', $verb = false) {
     }
 }
 
-#htprint($_SERVER);
+#htprint($_SERVER,"_SERVER");
 
 # db conn
 try {
@@ -50,8 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
         # set get vars
         if (isset($_GET)) {
 
-            $guests = (isset($_GET['guests']) && is_int((integer) $_GET['quests']))
-                        ? $_GET['guests']
+            $guests = (isset($_GET['guests']) && is_int((integer) $_GET['guests']))
+                        ? (int) $_GET['guests']
                         : NULL;
             htprint($guests,"guests");
 
@@ -75,14 +75,12 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
         }
 
         # construct 'where' clauses
-        /*
         $guest_clause = isset($guests)
-                        ? "and r.max_guests >= $guests"
+                        ? "and max_guests >= $guests"
                         : "";
         $storage_clause = isset($storage)
-                        ? "and r.max_storage >= $storage"
+                        ? "and max_storage >= $storage"
                         : "";
-        */
 
         ob_start();
         require("queries/entity_collection_moment.sql.php");
@@ -91,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
 
         $results = $db->query($query)->fetchAll();
 
-        htprint($results,"results");
+        #htprint($results,"results");
 
         htprint(json_encode($results,JSON_PRETTY_PRINT),"json_results");
 
