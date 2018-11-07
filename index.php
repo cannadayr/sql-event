@@ -57,39 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
 
         # build query
         $query = "
-select
-    '$date' as date_available,
-    room_id,
-    max_guests,
-    max_storage
-
-from
-
-    (select
-        r.id as room_id,
-        MIN(date(COALESCE(b.date,'$earliest_date'),'-2 days')) as prev_free,
-        MAX(date(COALESCE(b.date,'$earliest_date'),'+2 days')) as next_free,
-        COALESCE(max_guests,0) as max_guests,
-        COALESCE(max_storage,0) as max_storage
-
-    from room as r
-
-    left join booking b on b.room_id = r.id
-
-    where
-        1 = 1
-        $guest_clause
-        $storage_clause
-
-    group by
-        r.id)
-
-where
-    (next_free <= date('$date')
-    and prev_free <= date('$date'))
-    or
-    (next_free >= date('$date')
-    and prev_free >= date('$date'))
+select * from entity;
         ";
         htprint($query);
         $results = $db->query($query)->fetchAll();
