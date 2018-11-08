@@ -18,7 +18,7 @@ with recursive time_range(this_time_ref) as (
     )
 ),
 tick(rate) as (
-    select '+60 seconds' as rate
+    select '+3600 seconds' as rate -- 1 hour
 ),
 tick_unit(unit) as (
     select '%s' as unit -- seconds
@@ -27,16 +27,16 @@ tick_ratio(ratio) as (
     select rtrim(ltrim((select rate from tick),'+'),' seconds')
 ),
 start_moment(time_ref) as (
-    select '2017-12-31 23:00:00' as time_ref
+    select '<?= $start_time ?>' as time_ref
 ),
 end_moment(time_ref) as (
-    select '2018-01-01 07:00:00' as time_ref
+    select '<?= $end_time ?>' as time_ref
 ),
 this_entity(id) as (
-    select 1
+    select <?= $room_num ?>
 ),
 new_event(duration) as (
-    select '+1800 seconds' -- 30 minutes
+    select '+<?= $duration ?>'
 )
 
 select
