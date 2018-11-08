@@ -1,3 +1,6 @@
+/*<?php
+# vim: syn=sql
+?>*/
 with recursive time_range(this_time_ref) as (
     select
         (select time_ref from start_moment)
