@@ -88,23 +88,63 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
         $query = ob_get_clean();
         htprint($query,"query");
 
-        $results = $db->query($query);
-
-        if (!$results) {
-            htprint($db->errorInfo(),"sql err");
-        }
-        else {
-            $resultArr = $results->fetchAll();
-            htprint($resultArr,"resultArr");
-
-            htprint(json_encode($resultArr,JSON_PRETTY_PRINT),"json_results");
-
-            # if we're not in debug mode return json normally
-            if (!$GLOBALS['debug']) {
-                print("<pre>".json_encode($resultArr,JSON_PRETTY_PRINT)."</pre>");
-            }
-        }
+        fetch_and_print($db,$query);
 
     }
+    elseif ($route === "/times") {
+        if (isset($_GET)) {
 
+            $start_time = (
+                        isset($_GET['start_time'])
+                        && strtotime($_GET['start_time'])
+                    )
+                    ? date_create_from_format("Y-m-d H:i:s",$_GET['start_time'])->format("Y-m-d H:i:s")
+                    : date("Y-m-d H:i:s",time());
+            htprint($start_time,"start_time");
+
+            $end_time = (
+                        isset($_GET['end_time'])
+                        && strtotime($_GET['end_time'])
+                    )
+                    ? date_create_from_format("Y-m-d H:i:s",$_GET['end_time'])->format("Y-m-d H:i:s")
+                    : date("Y-m-d H:i:s",time());
+            htprint($end_time,"end_time");
+
+            $room_num = (isset($_GET['room_num']) && is_int((integer) $_GET['room_num']))
+                        ? (int) $_GET['room_num']
+                        : 1;
+            htprint($room_num,"room_num");
+
+            $duration = (isset($_GET['duration']) && is_int((integer) $_GET['duration']))
+                        ? ($_GET['duration'] * 60 * 60) # convert to seconds
+                        : (12 * 60 * 60); # 12 hours
+            htprint($duration,"duration");
+
+            ob_start();
+            require("queries/single_entity_range.sql.php");
+            $query = ob_get_clean();
+            htprint($query,"query");
+
+            fetch_and_print($db,$query);
+        }
+    }
+}
+
+function fetch_and_print($db,$query) {
+    $results = $db->query($query);
+
+    if (!$results) {
+        htprint($db->errorInfo(),"sql err");
+    }
+    else {
+        $resultArr = $results->fetchAll();
+        htprint($resultArr,"resultArr");
+
+        htprint(json_encode($resultArr,JSON_PRETTY_PRINT),"json_results");
+
+        # if we're not in debug mode return json normally
+        if (!$GLOBALS['debug']) {
+            print("<pre>".json_encode($resultArr,JSON_PRETTY_PRINT)."</pre>");
+        }
+    }
 }
