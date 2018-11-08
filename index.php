@@ -27,6 +27,7 @@ try {
     # only get associative arrays
     $options = [
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING
     ];
 
     # connect to db
@@ -87,16 +88,23 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
         $query = ob_get_clean();
         htprint($query,"query");
 
-        $results = $db->query($query)->fetchAll();
+        $results = $db->query($query);
 
-        #htprint($results,"results");
-
-        htprint(json_encode($results,JSON_PRETTY_PRINT),"json_results");
-
-        # if we're not in debug mode return json normally
-        if (!$GLOBALS['debug']) {
-            print("<pre>".json_encode($results,JSON_PRETTY_PRINT)."</pre>");
+        if (!$results) {
+            htprint($db->errorInfo(),"sql err");
         }
+        else {
+            $resultArr = $results->fetchAll();
+            htprint($resultArr,"resultArr");
+
+            htprint(json_encode($resultArr,JSON_PRETTY_PRINT),"json_results");
+
+            # if we're not in debug mode return json normally
+            if (!$GLOBALS['debug']) {
+                print("<pre>".json_encode($resultArr,JSON_PRETTY_PRINT)."</pre>");
+            }
+        }
+
     }
 
 }
