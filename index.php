@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
 
             $guests = (isset($_GET['guests']) && is_int((integer) $_GET['guests']))
                         ? (int) $_GET['guests']
-                        : NULL;
+                        : 1;
             htprint($guests,"guests");
 
             $storage = (isset($_GET['storage']) && is_int((integer) $_GET['storage']))
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
 
             $duration = (isset($_GET['duration']) && is_int((integer) $_GET['duration']))
                         ? ($_GET['duration'] * 60 * 60) # convert to seconds
-                        : NULL;
+                        : (12 * 60 * 60); # 12 hours
             htprint($duration,"duration");
 
             $time = (
