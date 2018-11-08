@@ -25,7 +25,7 @@ new_event(duration,num_guests) as (
 select
     *,
     case when
-        (prev_event_threshold >= coalesce(prev_event_end_time,'1970-01-01 00:00:00') -- 1
+        (prev_event_threshold <= this_time_ref
          and next_event_threshold <= coalesce(next_event_start_time,'9999-12-31 00:00:00')
          and not is_current_event
         ) then "available" else "unavailable"
@@ -35,7 +35,7 @@ from (
     select
         *,
         (select coalesce(datetime(prev_event_end_time,prev_event_cleanup),'9999-12-31 23:00:00')) as prev_event_threshold,
-        (select coalesce(datetime(datetime(this_time_ref,this_event_cleanup),new_event_duration),'1970-01-01 00:00:00')) as next_event_threshold
+        (select coalesce(datetime(new_event_end_time,this_event_cleanup),'1970-01-01 00:00:00')) as next_event_threshold
 
     from (
         select
@@ -49,7 +49,7 @@ from (
 
                 where
                     entity_id = entity_collection.id
-                    and end_time < moment.this_time_ref
+                    and end_time <= moment.this_time_ref
 
                 order by end_time desc
 
@@ -77,9 +77,10 @@ from (
             next_event.end_time as next_event_end_time,
             new_event.duration as new_event_duration,
             new_event.num_guests as new_event_num_guests,
-            (select "-" || cast((3600 + (coalesce(prev_event.num_guests,0) * 30 * 60)) as text) || " seconds") as prev_event_cleanup,
+            datetime(this_time_ref,new_event.duration) as new_event_end_time,
+            (select "+" || cast((3600 + (coalesce(prev_event.num_guests,0) * 30 * 60)) as text) || " seconds") as prev_event_cleanup,
             (select "+" || cast((3600 + (coalesce(new_event.num_guests,0) * 30 * 60)) as text) || " seconds") as this_event_cleanup,
-            (select count(id) from event where start_time <= moment.this_time_ref and end_time >= moment.this_time_ref and entity_id = entity_collection.id) as is_current_event
+            (select count(id) from event where start_time <= moment.this_time_ref and end_time > moment.this_time_ref and entity_id = entity_collection.id) as is_current_event
 
         from
             moment,
